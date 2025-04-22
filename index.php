@@ -41,3 +41,9 @@
 </body>
 
 </html>
+
+<style>
+    ::-webkit-scrollbar {
+        width: 0;
+    }
+</style>
