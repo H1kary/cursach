@@ -154,7 +154,7 @@
             bottom: 9px;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             header {
                 max-width: 80%;
             }
@@ -177,6 +177,10 @@
 
             .header-nav.active {
                 left: 0;
+            }
+
+            .header-nav.active a {
+                font-size: 24px;
             }
 
             .header-buttons {

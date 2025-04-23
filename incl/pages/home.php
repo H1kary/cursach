@@ -373,7 +373,9 @@
         left: 50%;
         transform: translateX(-50%);
         z-index: -1;
-
+        width: 100%;
+        max-width: 100%;
+        height: auto;
     }
 
     .marquee {
@@ -707,21 +709,26 @@
     .latest-slider-container {
         width: 100%;
         overflow: hidden;
-        position: relative;
         margin-top: 64px;
     }
 
     .latest-items {
         display: flex;
-        gap: 23px;
-        align-items: center;
         transition: transform 0.5s ease;
-        width: max-content;
     }
 
     .latest-item {
         width: 340px;
-        flex-shrink: 0;
+        flex: 0 0 auto;
+        margin-right: 23px;
+    }
+
+    .latest-item img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 2/3;
+        object-fit: cover;
+        display: block;
     }
 
     .latest-item a {
@@ -731,6 +738,8 @@
         font-style: normal;
         font-weight: 700;
         line-height: normal;
+        display: block;
+        margin-top: 10px;
     }
 
     .latest-item p {
@@ -740,7 +749,6 @@
         font-style: normal;
         font-weight: 500;
         line-height: 191.2%;
-        /* 28.68px */
     }
 
     .latest-header>div img {
@@ -835,6 +843,194 @@
         opacity: 1;
         transform: translateY(0);
     }
+
+    @media (max-width: 1024px) {
+        .main-text h1 {
+            font-size: 45px;
+        }
+
+        .main-text h1:last-of-type {
+            margin-left: 80px;
+        }
+
+        .about {
+            flex-direction: column;
+            margin-top: 60px;
+        }
+
+        .about-text {
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .about-text h2 {
+            font-size: 45px;
+        }
+
+        .about-text p {
+            font-size: 18px;
+        }
+
+        .popular h2,
+        .recommended h2,
+        .feedback > h2,
+        .latest-header h2,
+        .faq h2 {
+            font-size: 45px;
+        }
+
+        .popular-items,
+        .recommended-items {
+            justify-content: center;
+        }
+
+        .feedback-items {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .faq-items {
+            flex-direction: column;
+        }
+
+        .faq-column {
+            width: 100%;
+        }
+        
+        .latest-item {
+            width: 250px;
+        }
+    }
+
+    @media (max-width: 390px) {
+        .main-text h1 {
+            font-size: 32px;
+        }
+
+        .main-text h1:last-of-type {
+            margin-left: 20px;
+            margin-top: -10px;
+        }
+
+        .main-text {
+            margin-top: 50px;
+        }
+
+        .marquee {
+            margin-top: 150px;
+        }
+
+        .about-text h2,
+        .popular h2,
+        .recommended h2,
+        .feedback > h2,
+        .latest-header h2,
+        .faq h2 {
+            font-size: 32px;
+        }
+
+        .about-text p {
+            font-size: 16px;
+        }
+
+        .about-images {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .div1, .div2, .div3, .div4 {
+            margin-bottom: 15px;
+        }
+
+        .popular-item,
+        .recommended-item {
+            width: 48%;
+            display: inline-block;
+            vertical-align: top;
+            margin-bottom: 15px;
+        }
+        
+        .popular-item img,
+        .recommended-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .popular-item a,
+        .recommended-item a {
+            font-size: 14px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .popular-item p,
+        .recommended-item p {
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .popular-items,
+        .recommended-items {
+            gap: 5px;
+            text-align: center;
+        }
+
+        .feedback-item {
+            width: 100%;
+        }
+
+        .latest-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .latest-header > div {
+            margin-top: 20px;
+        }
+
+        .faq-item__header h3 {
+            font-size: 18px;
+        }
+
+        .faq-item__content {
+            font-size: 16px;
+        }
+
+        .faq-items {
+            margin-top: 40px;
+        }
+        
+        /* Слайдер для мобильных */
+        .latest-item {
+            width: 48%;
+            margin-right: 4%;
+        }
+        
+        .latest-item img {
+            aspect-ratio: 2/3;
+        }
+        
+        .latest-item a {
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .latest-item p {
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
 </style>
 
 <script>
@@ -842,17 +1038,17 @@
     document.addEventListener('DOMContentLoaded', function() {
         const marquee = document.querySelector('.marquee');
         const marqueeContent = document.querySelector('.marquee-content');
-        
+
         // Вычисляем полную ширину контента
         let contentWidth = 0;
         Array.from(marqueeContent.children).forEach(item => {
             contentWidth += item.offsetWidth + 20; // +20px от margin-right
         });
-        
+
         // Создаем достаточное количество дубликатов для полного заполнения ленты
         const screenWidth = window.innerWidth;
         const duplicatesNeeded = Math.ceil((screenWidth * 2) / contentWidth) + 1;
-        
+
         // Клонируем элементы
         for (let i = 0; i < duplicatesNeeded; i++) {
             Array.from(marqueeContent.children).forEach(item => {
@@ -860,7 +1056,7 @@
                 marqueeContent.appendChild(clone);
             });
         }
-        
+
         // Устанавливаем анимацию
         const duration = contentWidth / 50; // Скорость прокрутки: 50px в секунду
         marqueeContent.style.animation = `marquee ${duration}s linear infinite`;
@@ -877,76 +1073,111 @@
         // Получаем все элементы слайдера
         const items = slider.querySelectorAll('.latest-item');
         
-        // Определяем сколько элементов показывать за раз (на основе ширины экрана)
-        const itemsPerSlide = 4; // Показываем по 4 элемента за раз
+        // Общее количество элементов
+        const totalItems = items.length;
         
-        // Общее количество слайдов
-        const totalSlides = Math.ceil(items.length / itemsPerSlide);
-        totalSlidesElem.textContent = totalSlides;
-        
-        // Текущий слайд
-        let currentSlide = 1;
-        
-        // Функция для обновления отображения слайдера
-        function updateSlider() {
-            // Обновляем номер текущего слайда
-            currentSlideElem.textContent = currentSlide;
-            
-            // Вычисляем смещение для текущего слайда
-            const itemWidth = items[0].offsetWidth + 23; // 23px - это значение gap
-            const offset = (currentSlide - 1) * itemsPerSlide * itemWidth;
-            
-            // Применяем смещение к слайдеру с анимацией
-            slider.style.transform = `translateX(-${offset}px)`;
-            
-            // Включаем/отключаем кнопки в зависимости от текущего слайда
-            prevBtn.style.opacity = currentSlide === 1 ? "0.5" : "1";
-            nextBtn.style.opacity = currentSlide === totalSlides ? "0.5" : "1";
+        // Функция для определения количества видимых элементов в зависимости от ширины экрана
+        function getVisibleItems() {
+            const width = window.innerWidth;
+            if (width <= 390) {
+                return 2; // Для мобильных устройств
+            } else if (width <= 1024) {
+                return 3; // Для планшетов
+            } else {
+                return 4; // Для настольных компьютеров
+            }
         }
         
-        // Обработчик клика на кнопку "Предыдущий"
+        // Текущая позиция (начинаем с 0)
+        let currentPosition = 0;
+        
+        // Максимальное количество прокруток
+        function getMaxPosition() {
+            return totalItems - getVisibleItems();
+        }
+        
+        // Обновляем счетчик текущей позиции
+        function updateCounter() {
+            currentSlideElem.textContent = currentPosition + 1;
+            totalSlidesElem.textContent = getMaxPosition() + 1;
+        }
+        
+        // Функция для обновления слайдера
+        function updateSlider() {
+            // Определяем ширину элемента и отступы в зависимости от устройства
+            const itemWidth = (() => {
+                if (window.innerWidth <= 390) {
+                    // Ширина элемента + правый отступ для мобильных
+                    const item = items[0].getBoundingClientRect();
+                    return item.width + item.width * 0.04; // 4% отступ
+                } else if (window.innerWidth <= 1024) {
+                    return 250 + 23; // Ширина элемента + отступ для планшетов
+                } else {
+                    return 340 + 23; // Ширина элемента + отступ для десктопа
+                }
+            })();
+            
+            // Вычисляем смещение для текущей позиции
+            const offset = currentPosition * itemWidth;
+            
+            // Плавно перемещаем слайдер
+            slider.style.transform = `translateX(-${offset}px)`;
+            
+            // Управление активностью кнопок
+            prevBtn.style.opacity = currentPosition === 0 ? '0.5' : '1';
+            nextBtn.style.opacity = currentPosition === getMaxPosition() ? '0.5' : '1';
+            
+            // Обновляем счетчик
+            updateCounter();
+        }
+        
+        // Обработчики для кнопок
         prevBtn.addEventListener('click', function() {
-            if (currentSlide > 1) {
-                currentSlide--;
+            if (currentPosition > 0) {
+                currentPosition--;
                 updateSlider();
             }
         });
         
-        // Обработчик клика на кнопку "Следующий"
         nextBtn.addEventListener('click', function() {
-            if (currentSlide < totalSlides) {
-                currentSlide++;
+            if (currentPosition < getMaxPosition()) {
+                currentPosition++;
                 updateSlider();
             }
+        });
+        
+        // Обновляем слайдер при изменении размера окна
+        window.addEventListener('resize', function() {
+            // Проверяем, не вышли ли мы за границы после изменения размера окна
+            if (currentPosition > getMaxPosition()) {
+                currentPosition = getMaxPosition();
+            }
+            updateSlider();
         });
         
         // Инициализация слайдера
         updateSlider();
-        
-        // Добавляем стили взаимодействия для кнопок
-        prevBtn.style.cursor = 'pointer';
-        nextBtn.style.cursor = 'pointer';
     });
-    
+
     // FAQ аккордеон
     document.addEventListener('DOMContentLoaded', function() {
         const faqHeaders = document.querySelectorAll('.faq-item__header');
-        
+
         faqHeaders.forEach(header => {
             header.addEventListener('click', function() {
                 // Получаем контент и родительский элемент
                 const content = this.nextElementSibling;
                 const parentItem = this.parentElement;
-                
+
                 // Проверяем, активен ли текущий элемент
                 const isActive = this.classList.contains('active');
-                
+
                 // Закрываем все элементы
                 document.querySelectorAll('.faq-item__header').forEach(otherHeader => {
                     otherHeader.classList.remove('active');
                     otherHeader.nextElementSibling.classList.remove('active');
                 });
-                
+
                 // Если клик был не по активному элементу, открываем его
                 if (!isActive) {
                     this.classList.add('active');
