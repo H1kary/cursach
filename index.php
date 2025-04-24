@@ -14,20 +14,20 @@
     <?php include 'incl/pages/header.php'; ?>
 
     <?php
-    if (isset($_GET['page'])) {
-        if ($_GET['page'] == 'home') {
+    if (isset($_GET['p'])) {
+        if ($_GET['p'] == 'home') {
             include 'incl/pages/home.php';
-        } elseif ($_GET['page'] == 'catalog') {
+        } elseif ($_GET['p'] == 'catalog') {
             include 'incl/pages/catalog.php';
-        } elseif ($_GET['page'] == 'contacts') {
+        } elseif ($_GET['p'] == 'contacts') {
             include 'incl/pages/contacts.php';
-        } elseif ($_GET['page'] == 'profile') {
+        } elseif ($_GET['p'] == 'profile') {
             include 'incl/pages/profile.php';
-        } elseif ($_GET['page'] == 'subscription') {
-            include 'incl/pages/subscription.php';
-        } elseif ($_GET['page'] == 'admin') {
+        } elseif ($_GET['p'] == 'subscribe') {
+            include 'incl/pages/subscribe.php';
+        } elseif ($_GET['p'] == 'admin') {
             include 'incl/pages/admin.php';
-        } elseif ($_GET['page'] == 'film-page') {
+        } elseif ($_GET['p'] == 'film-page') {
             include 'incl/pages/film-page.php';
         } else {
             include 'incl/pages/404.php';
