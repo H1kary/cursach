@@ -634,6 +634,11 @@
         border-radius: 10px;
         background: #191E2E;
         position: relative;
+        transition: all ease-in-out 0.3s;
+    }
+
+    .feedback-item:hover {
+        background-color: rgba(54, 87, 203, 0.6);
     }
 
     .feedback-item>img {
@@ -873,7 +878,7 @@
 
         .popular h2,
         .recommended h2,
-        .feedback > h2,
+        .feedback>h2,
         .latest-header h2,
         .faq h2 {
             font-size: 45px;
@@ -896,7 +901,7 @@
         .faq-column {
             width: 100%;
         }
-        
+
         .latest-item {
             width: 250px;
         }
@@ -923,7 +928,7 @@
         .about-text h2,
         .popular h2,
         .recommended h2,
-        .feedback > h2,
+        .feedback>h2,
         .latest-header h2,
         .faq h2 {
             font-size: 32px;
@@ -939,7 +944,10 @@
             align-items: center;
         }
 
-        .div1, .div2, .div3, .div4 {
+        .div1,
+        .div2,
+        .div3,
+        .div4 {
             margin-bottom: 15px;
         }
 
@@ -950,7 +958,7 @@
             vertical-align: top;
             margin-bottom: 15px;
         }
-        
+
         .popular-item img,
         .recommended-item img {
             width: 100%;
@@ -958,7 +966,7 @@
             display: block;
             margin: 0 auto;
         }
-        
+
         .popular-item a,
         .recommended-item a {
             font-size: 14px;
@@ -967,7 +975,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+
         .popular-item p,
         .recommended-item p {
             font-size: 12px;
@@ -991,7 +999,7 @@
             align-items: flex-start;
         }
 
-        .latest-header > div {
+        .latest-header>div {
             margin-top: 20px;
         }
 
@@ -1006,24 +1014,24 @@
         .faq-items {
             margin-top: 40px;
         }
-        
+
         /* Слайдер для мобильных */
         .latest-item {
             width: 48%;
             margin-right: 4%;
         }
-        
+
         .latest-item img {
             aspect-ratio: 2/3;
         }
-        
+
         .latest-item a {
             font-size: 14px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+
         .latest-item p {
             font-size: 12px;
             white-space: nowrap;
@@ -1069,13 +1077,13 @@
         const nextBtn = document.getElementById('latest-next');
         const currentSlideElem = document.getElementById('current-slide');
         const totalSlidesElem = document.getElementById('total-slides');
-        
+
         // Получаем все элементы слайдера
         const items = slider.querySelectorAll('.latest-item');
-        
+
         // Общее количество элементов
         const totalItems = items.length;
-        
+
         // Функция для определения количества видимых элементов в зависимости от ширины экрана
         function getVisibleItems() {
             const width = window.innerWidth;
@@ -1087,21 +1095,21 @@
                 return 4; // Для настольных компьютеров
             }
         }
-        
+
         // Текущая позиция (начинаем с 0)
         let currentPosition = 0;
-        
+
         // Максимальное количество прокруток
         function getMaxPosition() {
             return totalItems - getVisibleItems();
         }
-        
+
         // Обновляем счетчик текущей позиции
         function updateCounter() {
             currentSlideElem.textContent = currentPosition + 1;
             totalSlidesElem.textContent = getMaxPosition() + 1;
         }
-        
+
         // Функция для обновления слайдера
         function updateSlider() {
             // Определяем ширину элемента и отступы в зависимости от устройства
@@ -1116,21 +1124,21 @@
                     return 340 + 23; // Ширина элемента + отступ для десктопа
                 }
             })();
-            
+
             // Вычисляем смещение для текущей позиции
             const offset = currentPosition * itemWidth;
-            
+
             // Плавно перемещаем слайдер
             slider.style.transform = `translateX(-${offset}px)`;
-            
+
             // Управление активностью кнопок
             prevBtn.style.opacity = currentPosition === 0 ? '0.5' : '1';
             nextBtn.style.opacity = currentPosition === getMaxPosition() ? '0.5' : '1';
-            
+
             // Обновляем счетчик
             updateCounter();
         }
-        
+
         // Обработчики для кнопок
         prevBtn.addEventListener('click', function() {
             if (currentPosition > 0) {
@@ -1138,14 +1146,14 @@
                 updateSlider();
             }
         });
-        
+
         nextBtn.addEventListener('click', function() {
             if (currentPosition < getMaxPosition()) {
                 currentPosition++;
                 updateSlider();
             }
         });
-        
+
         // Обновляем слайдер при изменении размера окна
         window.addEventListener('resize', function() {
             // Проверяем, не вышли ли мы за границы после изменения размера окна
@@ -1154,7 +1162,7 @@
             }
             updateSlider();
         });
-        
+
         // Инициализация слайдера
         updateSlider();
     });

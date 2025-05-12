@@ -11,7 +11,7 @@
     <div class="catalog-items">
         <div class="catalog-item">
             <img src="./assets/media/images/catalog/catalog1.png" alt="">
-            <a href="#">Черное море</a>
+            <a href="?p=film-page">Черное море</a>
         </div>
         <div class="catalog-item">
             <img src="./assets/media/images/catalog/catalog2.png" alt="">
