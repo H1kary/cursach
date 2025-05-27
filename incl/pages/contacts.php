@@ -1,28 +1,28 @@
 <section class="contacts">
     <h1>Обратная связь</h1>
     <div class="contacts-socials">
-        <a href="#" class="contacts-social">
-            <img src="./assets/media/images/contacts/vk.svg" alt="">
+        <a href="https://vk.com/clickon" target="_blank" class="contacts-social">
+            <img src="./assets/media/images/contacts/vk.svg" alt="ВКонтакте">
             <p>ВКонтакте</p>
             <p>vk.com/clickon</p>
         </a>
-        <a href="#" class="contacts-social">
-            <img src="./assets/media/images/contacts/wa.svg" alt="">
+        <a href="https://wa.me/clickon" target="_blank" class="contacts-social">
+            <img src="./assets/media/images/contacts/wa.svg" alt="WhatsApp">
             <p>WhatsApp</p>
             <p>@clickon</p>
         </a>
-        <a href="#" class="contacts-social">
-            <img src="./assets/media/images/contacts/tg.svg" alt="">
+        <a href="https://t.me/clickon" target="_blank" class="contacts-social">
+            <img src="./assets/media/images/contacts/tg.svg" alt="Telegram">
             <p>Telegram</p>
             <p>t.me/clickon</p>
         </a>
-        <a href="#" class="contacts-social">
-            <img src="./assets/media/images/contacts/ok.svg" alt="">
+        <a href="https://ok.ru/clickon" target="_blank" class="contacts-social">
+            <img src="./assets/media/images/contacts/ok.svg" alt="Odnoklassniki">
             <p>Odnoklassniki</p>
             <p>ok.ru/clickon</p>
         </a>
-        <a href="#" class="contacts-social">
-            <img src="./assets/media/images/contacts/email.svg" alt="">
+        <a href="mailto:direct@clickon.com" class="contacts-social">
+            <img src="./assets/media/images/contacts/email.svg" alt="E-mail">
             <p>E-mail</p>
             <p>direct@clickon.com</p>
         </a>
@@ -57,6 +57,11 @@
         border-radius: 10px;
         background: #191E2E;
         position: relative;
+        transition: all ease-in-out 0.3s;
+    }
+
+    .contacts-social:hover {
+        background-color: rgba(54, 87, 203, 0.6);
     }
 
     .contacts-social>img {

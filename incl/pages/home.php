@@ -1,3 +1,37 @@
+<?php
+// Подключаемся к базе данных
+require_once 'incl/connect/connect.php';
+
+// Получаем случайные фильмы для блока популярных фильмов (4 фильма)
+$popularQuery = "SELECT f.*, c.name as category_name FROM films f 
+                LEFT JOIN categories c ON f.category_id = c.id 
+                ORDER BY RAND() LIMIT 4";
+$popularStmt = $connect->prepare($popularQuery);
+$popularStmt->execute();
+$popularFilms = $popularStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Получаем случайные фильмы для баннера (8 фильмов или сколько есть в БД)
+$marqueeQuery = "SELECT f.* FROM films f ORDER BY RAND() LIMIT 8";
+$marqueeStmt = $connect->prepare($marqueeQuery);
+$marqueeStmt->execute();
+$marqueeFilms = $marqueeStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Получаем случайные фильмы для блока рекомендуемых (8 фильмов)
+$recommendedQuery = "SELECT f.*, c.name as category_name FROM films f 
+                     LEFT JOIN categories c ON f.category_id = c.id 
+                     ORDER BY RAND() LIMIT 8";
+$recommendedStmt = $connect->prepare($recommendedQuery);
+$recommendedStmt->execute();
+$recommendedFilms = $recommendedStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Получаем последние добавленные фильмы для блока новинок (16 фильмов)
+$latestQuery = "SELECT f.*, c.name as category_name FROM films f 
+                LEFT JOIN categories c ON f.category_id = c.id 
+                ORDER BY f.created_at DESC LIMIT 16";
+$latestStmt = $connect->prepare($latestQuery);
+$latestStmt->execute();
+$latestFilms = $latestStmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 <section class="home">
     <main>
         <div class="main-text">
@@ -7,14 +41,29 @@
     </main>
     <div class="main-slider marquee">
         <div class="marquee-content">
-            <a href="#"><img src="assets/media/images/home/main1.png" alt=""></a>
-            <a href="#"><img src="assets/media/images/home/main2.png" alt=""></a>
-            <a href="#"><img src="assets/media/images/home/main3.png" alt=""></a>
-            <a href="#"><img src="assets/media/images/home/main4.png" alt=""></a>
-            <a href="#"><img src="assets/media/images/home/main5.png" alt=""></a>
-            <a href="#"><img src="assets/media/images/home/main6.png" alt=""></a>
-            <a href="#"><img src="assets/media/images/home/main7.png" alt=""></a>
-            <a href="#"><img src="assets/media/images/home/main8.png" alt=""></a>
+            <?php if (!empty($marqueeFilms)): ?>
+                <?php foreach ($marqueeFilms as $film): ?>
+                    <a href="?p=film-page&id=<?php echo $film['id']; ?>">
+                        <img src="assets/media/images/catalog/<?php echo htmlspecialchars($film['poster']); ?>" alt="<?php echo htmlspecialchars($film['title']); ?>">
+                    </a>
+                <?php endforeach; ?>
+
+                <?php // Дублируем фильмы, чтобы заполнить ленту, если фильмов мало
+                foreach ($marqueeFilms as $film): ?>
+                    <a href="?p=film-page&id=<?php echo $film['id']; ?>">
+                        <img src="assets/media/images/catalog/<?php echo htmlspecialchars($film['poster']); ?>" alt="<?php echo htmlspecialchars($film['title']); ?>">
+                    </a>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <a href="?p=film-page&id=1"><img src="assets/media/images/home/main1.png" alt=""></a>
+                <a href="#"><img src="assets/media/images/home/main2.png" alt=""></a>
+                <a href="#"><img src="assets/media/images/home/main3.png" alt=""></a>
+                <a href="#"><img src="assets/media/images/home/main4.png" alt=""></a>
+                <a href="#"><img src="assets/media/images/home/main5.png" alt=""></a>
+                <a href="#"><img src="assets/media/images/home/main6.png" alt=""></a>
+                <a href="#"><img src="assets/media/images/home/main7.png" alt=""></a>
+                <a href="#"><img src="assets/media/images/home/main8.png" alt=""></a>
+            <?php endif; ?>
         </div>
     </div>
     <img class="main-bg" src="assets/media/images/home/mainbg.png" alt="">
@@ -57,26 +106,36 @@
     <div class="popular">
         <h2>Популярные фильмы</h2>
         <div class="popular-items">
-            <div class="popular-item">
-                <a href="#"><img src="assets/media/images/home/popular1.png" alt=""></a>
-                <a href="#">Джокер</a>
-                <p>Триллер, драма, криминал</p>
-            </div>
-            <div class="popular-item">
-                <a href="#"><img src="assets/media/images/home/popular2.png" alt=""></a>
-                <a href="#">История игрушек 4</a>
-                <p>Мультфильм, фэнтези, комедия, приключения ...</p>
-            </div>
-            <div class="popular-item">
-                <a href="#"><img src="assets/media/images/home/popular3.png" alt=""></a>
-                <a href="#">Однажды в… Голливуде</a>
-                <p>Драма, комедия</p>
-            </div>
-            <div class="popular-item">
-                <a href="#"><img src="assets/media/images/home/popular4.png" alt=""></a>
-                <a href="#">Солнцестояние</a>
-                <p>Ужасы, триллер, драма</p>
-            </div>
+            <?php if (!empty($popularFilms)): ?>
+                <?php foreach ($popularFilms as $film): ?>
+                    <a href="?p=film-page&id=<?php echo $film['id']; ?>" class="popular-item">
+                        <img src="assets/media/images/catalog/<?php echo htmlspecialchars($film['poster']); ?>" alt="<?php echo htmlspecialchars($film['title']); ?>">
+                        <h5><?php echo htmlspecialchars($film['title']); ?></h5>
+                        <p><?php echo htmlspecialchars($film['original_title']); ?>, <?php echo htmlspecialchars($film['year']); ?></p>
+                    </a>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <a href="?p=film-page&id=" class="popular-item">
+                    <img src="assets/media/images/home/popular1.png" alt="">
+                    <h5>Джокер</h5>
+                    <p>Joker, 2019</p>
+                </a>
+                <a href="?p=film-page&id=" class="popular-item">
+                    <img src="assets/media/images/home/popular2.png" alt="">
+                    <h5>История игрушек 4</h5>
+                    <p>Toy Story, 2019</p>
+                </a>
+                <a href="?p=film-page&id=" class="popular-item">
+                    <img src="assets/media/images/home/popular3.png" alt="">
+                    <h5>Однажды в… Голливуде</h5>
+                    <p>Once Upon a Time... in Hollywood, 2019</p>
+                </a>
+                <a href="?p=film-page&id=" class="popular-item">
+                    <img src="assets/media/images/home/popular4.png" alt="">
+                    <h5>Солнцестояние</h5>
+                    <p>Midsommar, 2019</p>
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -84,46 +143,56 @@
     <div class="recommended">
         <h2>Рекомендуем к просмотру</h2>
         <div class="recommended-items">
-            <div class="recommended-item">
-                <a href="#"><img src="assets/media/images/home/recommended1.png" alt=""></a>
-                <a href="#">Побег из Претории</a>
-                <p>Триллер</p>
-            </div>
-            <div class="recommended-item">
-                <a href="#"><img src="assets/media/images/home/recommended2.png" alt=""></a>
-                <a href="#">Джокер</a>
-                <p>Триллер, драма, криминал</p>
-            </div>
-            <div class="recommended-item">
-                <a href="#"><img src="assets/media/images/home/recommended3.png" alt=""></a>
-                <a href="#">Звёздные войны: Скайуокер. Восход</a>
-                <p>Фантастика, фэнтези, боевик, приключения</p>
-            </div>
-            <div class="recommended-item">
-                <a href="#"><img src="assets/media/images/home/recommended4.png" alt=""></a>
-                <a href="#">Джентльмены</a>
-                <p>Боевик, комедия, криминал</p>
-            </div>
-            <div class="recommended-item">
-                <a href="#"><img src="assets/media/images/home/recommended5.png" alt=""></a>
-                <a href="#">Ford против Ferrari</a>
-                <p>Биография, спорт, драма, боевик</p>
-            </div>
-            <div class="recommended-item">
-                <a href="#"><img src="assets/media/images/home/recommended6.png" alt=""></a>
-                <a href="#">3022</a>
-                <p>Фантастика, триллер</p>
-            </div>
-            <div class="recommended-item">
-                <a href="#"><img src="assets/media/images/home/recommended7.png" alt=""></a>
-                <a href="#">Хищные птицы: Потрясающая история Харли Квинн</a>
-                <p>Боевик, криминал, комедия</p>
-            </div>
-            <div class="recommended-item">
-                <a href="#"><img src="assets/media/images/home/recommended8.png" alt=""></a>
-                <a href="#">Плохие парни навсегда</a>
-                <p>Боевик, комедия, криминал</p>
-            </div>
+            <?php if (!empty($recommendedFilms)): ?>
+                <?php foreach ($recommendedFilms as $film): ?>
+                <a href="?p=film-page&id=<?php echo $film['id']; ?>" class="recommended-item">
+                    <img src="assets/media/images/catalog/<?php echo htmlspecialchars($film['poster']); ?>" alt="<?php echo htmlspecialchars($film['title']); ?>">
+                    <h5><?php echo htmlspecialchars($film['title']); ?></h5>
+                    <p><?php echo htmlspecialchars($film['original_title']); ?>, <?php echo htmlspecialchars($film['year']); ?></p>
+                </a>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="recommended-item">
+                    <a href="#"><img src="assets/media/images/home/recommended1.png" alt=""></a>
+                    <a href="#">Побег из Претории</a>
+                    <p>Триллер</p>
+                </div>
+                <div class="recommended-item">
+                    <a href="#"><img src="assets/media/images/home/recommended2.png" alt=""></a>
+                    <a href="#">Джокер</a>
+                    <p>Триллер, драма, криминал</p>
+                </div>
+                <div class="recommended-item">
+                    <a href="#"><img src="assets/media/images/home/recommended3.png" alt=""></a>
+                    <a href="#">Звёздные войны: Скайуокер. Восход</a>
+                    <p>Фантастика, фэнтези, боевик, приключения</p>
+                </div>
+                <div class="recommended-item">
+                    <a href="#"><img src="assets/media/images/home/recommended4.png" alt=""></a>
+                    <a href="#">Джентльмены</a>
+                    <p>Боевик, комедия, криминал</p>
+                </div>
+                <div class="recommended-item">
+                    <a href="#"><img src="assets/media/images/home/recommended5.png" alt=""></a>
+                    <a href="#">Ford против Ferrari</a>
+                    <p>Биография, спорт, драма, боевик</p>
+                </div>
+                <div class="recommended-item">
+                    <a href="#"><img src="assets/media/images/home/recommended6.png" alt=""></a>
+                    <a href="#">3022</a>
+                    <p>Фантастика, триллер</p>
+                </div>
+                <div class="recommended-item">
+                    <a href="#"><img src="assets/media/images/home/recommended7.png" alt=""></a>
+                    <a href="#">Хищные птицы: Потрясающая история Харли Квинн</a>
+                    <p>Боевик, криминал, комедия</p>
+                </div>
+                <div class="recommended-item">
+                    <a href="#"><img src="assets/media/images/home/recommended8.png" alt=""></a>
+                    <a href="#">Плохие парни навсегда</a>
+                    <p>Боевик, комедия, криминал</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -132,28 +201,28 @@
         <h2>Обратная связь</h2>
         <p>Твое мнение помогает нам становиться лучше. Есть идеи, пожелания или вопросы? Напиши нам! В «Кликон» мы ценим каждого зрителя и стремимся сделать твой опыт просмотра идеальным. Оставь отзыв, и мы ответим максимально быстро – потому что твой голос важен для нас.</p>
         <div class="feedback-items">
-            <a href="#" class="feedback-item">
-                <img src="assets/media/images/home/feedback1.svg" alt="">
+            <a href="https://vk.com/clickon" target="_blank" class="feedback-item">
+                <img src="assets/media/images/home/feedback1.svg" alt="ВКонтакте">
                 <p>ВКонтакте</p>
                 <p>vk.com/clickon</p>
             </a>
-            <a href="#" class="feedback-item">
-                <img src="assets/media/images/home/feedback2.svg" alt="">
+            <a href="https://wa.me/clickon" target="_blank" class="feedback-item">
+                <img src="assets/media/images/home/feedback2.svg" alt="WhatsApp">
                 <p>WhatsApp</p>
                 <p>@clickon</p>
             </a>
-            <a href="#" class="feedback-item">
-                <img src="assets/media/images/home/feedback3.svg" alt="">
+            <a href="https://t.me/clickon" target="_blank" class="feedback-item">
+                <img src="assets/media/images/home/feedback3.svg" alt="Telegram">
                 <p>Telegram</p>
                 <p>t.me/clickon</p>
             </a>
-            <a href="#" class="feedback-item">
-                <img src="assets/media/images/home/feedback4.svg" alt="">
+            <a href="https://ok.ru/clickon" target="_blank" class="feedback-item">
+                <img src="assets/media/images/home/feedback4.svg" alt="Odnoklassniki">
                 <p>Odnoklassniki</p>
                 <p>ok.ru/clickon</p>
             </a>
-            <a href="#" class="feedback-item">
-                <img src="assets/media/images/home/feedback5.svg" alt="">
+            <a href="mailto:direct@clickon.com" class="feedback-item">
+                <img src="assets/media/images/home/feedback5.svg" alt="E-mail">
                 <p>E-mail</p>
                 <p>direct@clickon.com</p>
             </a>
@@ -172,107 +241,98 @@
         </div>
         <div class="latest-slider-container">
             <div class="latest-items" id="latest-slider">
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest1.png" alt=""></a>
-                    <a href="#">Побег из Претории</a>
-                    <p>12 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest2.png" alt=""></a>
-                    <a href="#">Прощай</a>
-                    <p>14 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest3.png" alt=""></a>
-                    <a href="#">Дружить по-русски!</a>
-                    <p>21 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest4.png" alt=""></a>
-                    <a href="#">Приди ко мне</a>
-                    <p>25 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest1.png" alt=""></a>
-                    <a href="#">Побег из Претории</a>
-                    <p>12 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest2.png" alt=""></a>
-                    <a href="#">Прощай</a>
-                    <p>14 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest3.png" alt=""></a>
-                    <a href="#">Дружить по-русски!</a>
-                    <p>21 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest4.png" alt=""></a>
-                    <a href="#">Приди ко мне</a>
-                    <p>25 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest1.png" alt=""></a>
-                    <a href="#">Побег из Претории</a>
-                    <p>12 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest2.png" alt=""></a>
-                    <a href="#">Прощай</a>
-                    <p>14 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest3.png" alt=""></a>
-                    <a href="#">Дружить по-русски!</a>
-                    <p>21 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest4.png" alt=""></a>
-                    <a href="#">Приди ко мне</a>
-                    <p>25 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest1.png" alt=""></a>
-                    <a href="#">Побег из Претории</a>
-                    <p>12 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest2.png" alt=""></a>
-                    <a href="#">Прощай</a>
-                    <p>14 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest3.png" alt=""></a>
-                    <a href="#">Дружить по-русски!</a>
-                    <p>21 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest4.png" alt=""></a>
-                    <a href="#">Приди ко мне</a>
-                    <p>25 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest1.png" alt=""></a>
-                    <a href="#">Побег из Претории</a>
-                    <p>12 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest2.png" alt=""></a>
-                    <a href="#">Прощай</a>
-                    <p>14 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest3.png" alt=""></a>
-                    <a href="#">Дружить по-русски!</a>
-                    <p>21 мая 2025 в России</p>
-                </div>
-                <div class="latest-item">
-                    <a href="#"><img src="assets/media/images/home/latest4.png" alt=""></a>
-                    <a href="#">Приди ко мне</a>
-                    <p>25 мая 2025 в России</p>
-                </div>
-
+                <?php if (!empty($latestFilms)): ?>
+                    <?php foreach ($latestFilms as $film): ?>
+                    <div class="latest-item">
+                        <a href="?p=film-page&id=<?php echo $film['id']; ?>">
+                            <img src="assets/media/images/catalog/<?php echo htmlspecialchars($film['poster']); ?>" alt="<?php echo htmlspecialchars($film['title']); ?>">
+                        </a>
+                        <a href="?p=film-page&id=<?php echo $film['id']; ?>"><?php echo htmlspecialchars($film['title']); ?></a>
+                        <p>Добавлен: <?php echo date('d.m.Y', strtotime($film['created_at'])); ?></p>
+                    </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest1.png" alt=""></a>
+                        <a href="#">Побег из Претории</a>
+                        <p>12 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest2.png" alt=""></a>
+                        <a href="#">Прощай</a>
+                        <p>14 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest3.png" alt=""></a>
+                        <a href="#">Дружить по-русски!</a>
+                        <p>21 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest4.png" alt=""></a>
+                        <a href="#">Приди ко мне</a>
+                        <p>25 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest1.png" alt=""></a>
+                        <a href="#">Побег из Претории</a>
+                        <p>12 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest2.png" alt=""></a>
+                        <a href="#">Прощай</a>
+                        <p>14 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest3.png" alt=""></a>
+                        <a href="#">Дружить по-русски!</a>
+                        <p>21 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest4.png" alt=""></a>
+                        <a href="#">Приди ко мне</a>
+                        <p>25 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest1.png" alt=""></a>
+                        <a href="#">Побег из Претории</a>
+                        <p>12 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest2.png" alt=""></a>
+                        <a href="#">Прощай</a>
+                        <p>14 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest3.png" alt=""></a>
+                        <a href="#">Дружить по-русски!</a>
+                        <p>21 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest4.png" alt=""></a>
+                        <a href="#">Приди ко мне</a>
+                        <p>25 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest1.png" alt=""></a>
+                        <a href="#">Побег из Претории</a>
+                        <p>12 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest2.png" alt=""></a>
+                        <a href="#">Прощай</a>
+                        <p>14 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest3.png" alt=""></a>
+                        <a href="#">Дружить по-русски!</a>
+                        <p>21 мая 2025 в России</p>
+                    </div>
+                    <div class="latest-item">
+                        <a href="#"><img src="assets/media/images/home/latest4.png" alt=""></a>
+                        <a href="#">Приди ко мне</a>
+                        <p>25 мая 2025 в России</p>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -283,58 +343,58 @@
             <div class="faq-column">
                 <div class="faq-item">
                     <div class="faq-item__header">
-                        <h3>Как зарегистрироваться в сервисе?</h3>
+                        <h3>Как зарегистрироваться на сервисе?</h3>
                         <img src="assets/media/images/home/faqarrow.svg" alt="">
                     </div>
                     <div class="faq-item__content">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
+                        <p>Для регистрации нажмите кнопку "Регистрация" в правом верхнем углу экрана. Заполните форму, указав ваш email, имя и придумав надежный пароль. После этого вы сможете пользоваться всеми функциями нашего сервиса.</p>
                     </div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-item__header">
-                        <h3>Как зарегистрироваться в сервисе?</h3>
+                        <h3>Как оформить подписку?</h3>
                         <img src="assets/media/images/home/faqarrow.svg" alt="">
                     </div>
                     <div class="faq-item__content">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
+                        <p>После регистрации вы можете оформить подписку в разделе "Подписка". Вы получите доступ к эксклюзивному контенту после одобрения подписки администратором</p>
                     </div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-item__header">
-                        <h3>Как зарегистрироваться в сервисе?</h3>
+                        <h3>Можно ли скачивать фильмы для просмотра офлайн?</h3>
                         <img src="assets/media/images/home/faqarrow.svg" alt="">
                     </div>
                     <div class="faq-item__content">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
+                        <p>Нет, в нашем сервисе нет функции скачивания контента для офлайн-просмотра. Наша политика пользования не позволяет скачивать контент.</p>
                     </div>
                 </div>
             </div>
             <div class="faq-column">
                 <div class="faq-item">
                     <div class="faq-item__header">
-                        <h3>Как зарегистрироваться в сервисе?</h3>
+                        <h3>Как отменить подписку?</h3>
                         <img src="assets/media/images/home/faqarrow.svg" alt="">
                     </div>
                     <div class="faq-item__content">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
+                        <p>Вы можете отменить подписку в любое время в разделе "Профиль" - "Управление подпиской".</p>
                     </div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-item__header">
-                        <h3>Как зарегистрироваться в сервисе?</h3>
+                        <h3>На каких устройствах можно смотреть фильмы?</h3>
                         <img src="assets/media/images/home/faqarrow.svg" alt="">
                     </div>
                     <div class="faq-item__content">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
+                        <p>Наш сервис доступен на различных устройствах: компьютеры, ноутбуки, планшеты, смартфоны.</p>
                     </div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-item__header">
-                        <h3>Как зарегистрироваться в сервисе?</h3>
+                        <h3>Какие доступны фильмы?</h3>
                         <img src="assets/media/images/home/faqarrow.svg" alt="">
                     </div>
                     <div class="faq-item__content">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
+                        <p>В каталоге нашего сервиса доступно более 20 различных фильмов, от самых популярных до крайне малоизвестных.</p>
                     </div>
                 </div>
             </div>
@@ -393,6 +453,21 @@
     .marquee-content a {
         flex-shrink: 0;
         margin-right: 20px;
+        max-width: 232px;
+        max-height: 296px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .marquee-content a img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        border-radius: 10px;
+
     }
 
     @keyframes marquee {
@@ -529,9 +604,16 @@
 
     .popular-item {
         width: 340px;
+        max-width: 340px;
     }
 
-    .popular-item a {
+    .popular-item img {
+        max-width: 340px;
+        max-height: 463px;
+        border-radius: 10px;
+    }
+
+    .popular-item h5 {
         color: #FFF;
         font-family: Qanelas;
         font-size: 18px;
@@ -575,9 +657,16 @@
 
     .recommended-item {
         width: 340px;
+        max-width: 340px;
     }
 
-    .recommended-item a {
+    .recommended-item img {
+        max-width: 340px;
+        max-height: 463px;
+        border-radius: 10px;
+    }
+
+    .recommended-item h5 {
         color: #FFF;
         font-family: Qanelas;
         font-size: 18px;
@@ -922,7 +1011,12 @@
         }
 
         .marquee {
-            margin-top: 150px;
+            margin-top: 50px;
+        }
+
+        .marquee-content a {
+            max-height: 160px;
+            max-width: 125.4054054054px;
         }
 
         .about-text h2,
@@ -957,6 +1051,7 @@
             display: inline-block;
             vertical-align: top;
             margin-bottom: 15px;
+            max-height: 287px;
         }
 
         .popular-item img,
@@ -965,6 +1060,10 @@
             height: auto;
             display: block;
             margin: 0 auto;
+            /* width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center; */
         }
 
         .popular-item a,

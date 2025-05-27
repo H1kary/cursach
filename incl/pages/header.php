@@ -1,24 +1,45 @@
     <!-- header-start -->
     <header>
+        <?php if(!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1): ?>
         <div class="header-logo">
             <a href="?p=home"><img src="assets/media/images/logo.svg" alt=""></a>
         </div>
+        <?php endif; ?>
         <nav class="header-nav">
-            <a href="?p=catalog">Каталог</a>
-            <a href="?p=subscribe">Подписка</a>
-            <a href="?p=contacts">Контакты</a>
+            <?php if(isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
+                <a href="?p=profile">Профиль</a>
+                <a href="?p=admin">Админ-панель</a>
+            <?php else: ?>
+                <a href="?p=home">Главная</a>
+                <a href="?p=catalog">Фильмы</a>
+                <a href="?p=contacts">Контакты</a>
+            <?php endif; ?>
         </nav>
-        <!-- <div class="header-user">
+        <?php if(isset($_SESSION['user_id'])): ?>
+        <div class="header-user">
             <a href="?p=profile">
-                <img src="./assets/media/images/header/dropdown.svg" alt="">
-                <p>Юрий</p>
-                <img src="./assets/media/images/header/avatar.png" alt="">
+                <p><?php echo $_SESSION['user_name']; ?></p>
+                <?php 
+                // Проверяем наличие аватара пользователя
+                if(isset($_SESSION['user_avatar']) && !empty($_SESSION['user_avatar']) && $_SESSION['user_avatar'] != 'default.jpg') {
+                    $avatar_path = './incl/userprofiles/' . $_SESSION['user_avatar'];
+                    // Дополнительная проверка существования файла
+                    if(!file_exists($avatar_path)) {
+                        $avatar_path = './assets/media/images/profile/default-avatar.png';
+                    }
+                } else {
+                    $avatar_path = './assets/media/images/profile/default-avatar.png';
+                }
+                ?>
+                <img src="<?php echo $avatar_path; ?>" alt="Аватар пользователя" class="user-avatar">
             </a>
-        </div> -->
+        </div>
+        <?php else: ?>
         <div class="header-buttons">
             <a href="#" id="register-btn">Регистрация</a>
             <a href="#" id="login-btn">Войти</a>
         </div>
+        <?php endif; ?>
         <div class="header-burger">
             <span></span>
             <span></span>
@@ -26,13 +47,22 @@
         </div>
     </header>
 
+    <?php if(isset($_SESSION['error'])): ?>
+    <div class="error-message">
+        <?php 
+        echo $_SESSION['error'];
+        unset($_SESSION['error']);
+        ?>
+    </div>
+    <?php endif; ?>
+
     <div class="modal-overlay"></div>
     <div class="login-modal">
         <div>
-            <form action="">
+            <form action="incl/connect/login.php" method="POST">
                 <h4>Авторизация</h4>
-                <input type="email" name="" id="login_email" placeholder="E-mail">
-                <input type="password" name="" id="login_password" placeholder="Пароль">
+                <input type="email" name="email" id="login_email" placeholder="E-mail" required>
+                <input type="password" name="password" id="login_password" placeholder="Пароль" required>
                 <div>
                     <input type="submit" value="Войти">
                     <a href="#" id="go-to-register">Нет аккаунта? <span>Регистрация</span></a>
@@ -43,12 +73,12 @@
     </div>
     <div class="registration-modal">
         <div>
-            <form action="">
+            <form action="incl/connect/register.php" method="POST">
                 <h4>Регистрация</h4>
-                <input type="email" name="" id="registration_email" placeholder="E-mail">
-                <input type="text" name="" id="registration_name" placeholder="Имя">
-                <input type="password" name="" id="registration_password" placeholder="Пароль">
-                <input type="password" name="" id="registration_password_check" placeholder="Повтор Пароля">
+                <input type="email" name="email" id="registration_email" placeholder="E-mail" required>
+                <input type="text" name="name" id="registration_name" placeholder="Имя" required>
+                <input type="password" name="password" id="registration_password" placeholder="Пароль" required>
+                <input type="password" name="password_check" id="registration_password_check" placeholder="Повтор Пароля" required>
                 <div>
                     <input type="submit" value="Зарегистрироваться">
                     <a href="#" id="go-to-login">Уже есть аккаунт? <span>Войти</span></a>
@@ -142,6 +172,14 @@
             font-weight: 600;
             line-height: 166.5%;
             /* 24.975px */
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3657CB;
         }
 
         .header-burger {
@@ -579,6 +617,18 @@
                 max-width: 100% !important;
             }
         }
+
+        .error-message {
+            max-width: 1430px;
+            margin: 10px auto;
+            padding: 10px;
+            background-color: rgba(255, 0, 0, 0.2);
+            border-radius: 5px;
+            color: #fff;
+            text-align: center;
+            font-family: 'Qanelas';
+            font-weight: 600;
+        }
     </style>
 
     <script>
@@ -699,6 +749,126 @@
                     body.classList.remove('lock');
                 });
             });
+            
+            // Проверяем наличие параметра action в URL для открытия соответствующего модального окна
+            const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
+            
+            if (action === 'login') {
+                openModal(loginModal);
+            } else if (action === 'register') {
+                openModal(registrationModal);
+            }
+        });
+
+        // Валидация формы регистрации
+        document.addEventListener('DOMContentLoaded', function() {
+            const registrationForm = document.querySelector('.registration-modal form');
+            const loginForm = document.querySelector('.login-modal form');
+            
+            if (registrationForm) {
+                registrationForm.addEventListener('submit', function(e) {
+                    const nameInput = document.getElementById('registration_name');
+                    const passwordInput = document.getElementById('registration_password');
+                    const passwordCheckInput = document.getElementById('registration_password_check');
+                    const emailInput = document.getElementById('registration_email');
+                    
+                    let isValid = true;
+                    let errorMessage = '';
+                    
+                    // Проверка имени (минимум 3 символа)
+                    if (nameInput.value.trim().length < 3) {
+                        errorMessage = 'Имя должно содержать минимум 3 символа';
+                        isValid = false;
+                    }
+                    
+                    // Проверка пароля (английский язык, минимум одна заглавная буква и одна цифра)
+                    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
+                    if (!passwordRegex.test(passwordInput.value)) {
+                        errorMessage = 'Пароль должен содержать минимум 6 символов, только английские буквы, минимум одну заглавную букву и одну цифру';
+                        isValid = false;
+                    }
+                    
+                    // Проверка совпадения паролей
+                    if (passwordInput.value !== passwordCheckInput.value) {
+                        errorMessage = 'Пароли не совпадают';
+                        isValid = false;
+                    }
+                    
+                    // Проверка email
+                    if (emailInput.value.trim() === '') {
+                        errorMessage = 'Email не может быть пустым';
+                        isValid = false;
+                    }
+                    
+                    if (!isValid) {
+                        e.preventDefault();
+                        // Создаем временное сообщение об ошибке
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'form-error-message';
+                        errorDiv.textContent = errorMessage;
+                        errorDiv.style.color = '#ff6b6b';
+                        errorDiv.style.fontSize = '14px';
+                        errorDiv.style.marginTop = '10px';
+                        errorDiv.style.marginBottom = '10px';
+                        errorDiv.style.fontFamily = 'Qanelas';
+                        
+                        // Удаляем предыдущее сообщение об ошибке, если оно есть
+                        const existingError = registrationForm.querySelector('.form-error-message');
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        
+                        // Добавляем сообщение об ошибке перед кнопкой отправки
+                        registrationForm.insertBefore(errorDiv, registrationForm.querySelector('div'));
+                    }
+                });
+            }
+            
+            // Валидация формы авторизации
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    const emailInput = document.getElementById('login_email');
+                    const passwordInput = document.getElementById('login_password');
+                    
+                    let isValid = true;
+                    let errorMessage = '';
+                    
+                    // Проверка email
+                    if (emailInput.value.trim() === '') {
+                        errorMessage = 'Email не может быть пустым';
+                        isValid = false;
+                    }
+                    
+                    // Проверка пароля
+                    if (passwordInput.value.trim() === '') {
+                        errorMessage = 'Пароль не может быть пустым';
+                        isValid = false;
+                    }
+                    
+                    if (!isValid) {
+                        e.preventDefault();
+                        // Создаем временное сообщение об ошибке
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'form-error-message';
+                        errorDiv.textContent = errorMessage;
+                        errorDiv.style.color = '#ff6b6b';
+                        errorDiv.style.fontSize = '14px';
+                        errorDiv.style.marginTop = '10px';
+                        errorDiv.style.marginBottom = '10px';
+                        errorDiv.style.fontFamily = 'Qanelas';
+                        
+                        // Удаляем предыдущее сообщение об ошибке, если оно есть
+                        const existingError = loginForm.querySelector('.form-error-message');
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        
+                        // Добавляем сообщение об ошибке перед кнопкой отправки
+                        loginForm.insertBefore(errorDiv, loginForm.querySelector('div'));
+                    }
+                });
+            }
         });
     </script>
     <!-- header-end -->

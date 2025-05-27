@@ -6,11 +6,11 @@
                     <a href="?p=home"><img src="assets/media/images/logo.svg" alt=""></a>
                 </div>
                 <div class="footer-links">
-                    <a href="#"><img src="assets/media/images/footer/vk.svg" alt=""></a>
-                    <a href="#"><img src="assets/media/images/footer/wa.svg" alt=""></a>
-                    <a href="#"><img src="assets/media/images/footer/tg.svg" alt=""></a>
-                    <a href="#"><img src="assets/media/images/footer/ok.svg" alt=""></a>
-                    <a href="#"><img src="assets/media/images/footer/yt.svg" alt=""></a>
+                    <a href="https://vk.com/clickon" target="_blank"><img src="assets/media/images/footer/vk.svg" alt="ВКонтакте"></a>
+                    <a href="https://wa.me/79123456789" target="_blank"><img src="assets/media/images/footer/wa.svg" alt="WhatsApp"></a>
+                    <a href="https://t.me/clickon" target="_blank"><img src="assets/media/images/footer/tg.svg" alt="Telegram"></a>
+                    <a href="https://ok.ru/group/clickon" target="_blank"><img src="assets/media/images/footer/ok.svg" alt="Одноклассники"></a>
+                    <a href="https://www.youtube.com/c/clickon" target="_blank"><img src="assets/media/images/footer/yt.svg" alt="YouTube"></a>
                 </div>
                 <div class="footer-nav">
                     <a href="?p=catalog">Каталог</a>
@@ -20,9 +20,9 @@
             </div>
             <div class="footer-bottom">
                 <p>2025 © Кликон. Белов Юрий Алексеевич</p>
-                <a href="#">Политика конфиденциальности</a>
-                <a href="#">Условия пользования</a>
-                <a href="#">Политика использования файлов cookie</a>
+                <a href="assets/documents/privacy_policy.txt" download>Политика конфиденциальности</a>
+                <a href="assets/documents/terms_of_use.txt" download>Условия пользования</a>
+                <a href="assets/documents/cookie_policy.txt" download>Политика использования файлов cookie</a>
             </div>
         </div>
     </footer>
@@ -53,6 +53,15 @@
         .footer-links {
             display: flex;
             gap: 15px;
+        }
+
+        .footer-links a {
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            transform: scale(1.2);
         }
 
         .footer-links a img {
@@ -91,6 +100,11 @@
             font-style: normal;
             font-weight: 700;
             line-height: normal;
+            transition: color 0.3s ease;
+        }
+
+        .footer-nav a:hover {
+            color: #F2F60F;
         }
 
         .footer-bottom {
@@ -127,6 +141,11 @@
             text-decoration-thickness: auto;
             text-underline-offset: auto;
             text-underline-position: from-font;
+            transition: color 0.3s ease;
+        }
+
+        .footer-bottom a:hover {
+            color: #F2F60F;
         }
 
         @media screen and (max-width: 1024px) {
